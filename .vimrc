@@ -28,6 +28,12 @@ Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
 
 Plugin 'https://github.com/Valloric/YouCompleteMe.git'
 
+Plugin 'lervag/vimtex'
+
+Plugin 'https://github.com/sheerun/vim-polyglot.git'
+
+
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -101,7 +107,7 @@ function CFuncHeading()
   let s:type=split(split(s:line, "(")[0])[0]
   let s:name=split(split(s:line, "(")[0])[1]
   let s:args=split(split(split(s:line, "(")[1], ")")[0], ",")
-  normal O<ESC>k
+  normal! O<ESC>k
   let s:newline=line(".")
   let s:i = 0
   call setline(s:newline, "/*")
@@ -133,8 +139,8 @@ function CFuncHeading()
   unlet s:newline
 endfunction
 
-imap <F3> <ESC>mz:execute CFuncHeading()<CR>`zA
+imap <F3> <ESC>:execute CFuncHeading()<CR>?TODO<CR>nncw
 "}}}
 
 
-
+let maplocalleader='\\'
