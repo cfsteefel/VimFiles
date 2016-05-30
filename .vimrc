@@ -1,4 +1,8 @@
-setlocal foldmethod=marker
+" Name: .vimrc
+" Author: Christoph Steefel
+" Created with help from Aniket Mathur, the interwebs.
+set foldmethod=marker
+set foldenable
 " Vundle information"{{{
 set nocompatible
 filetype off
@@ -70,7 +74,8 @@ set hlsearch"}}}
 " Enable the mouse"{{{
 set mouse=a"}}}
 " make Wq equivalent to wq for convenience"{{{
-cnoreabbrev Wq wq"}}}
+cnoreabbrev Wq wq
+"}}}
 " 80 Character edits"{{{
 " Highlight characters past 80 characters in red
 highlight OverLength ctermbg=red ctermfg=white guibg=#592929
@@ -80,8 +85,6 @@ set cc=80"}}}
 " Show tabs as >--, and show trailing whitespace as ~"{{{
 set listchars=tab:>-,trail:~
 set list"}}}
-" Delete trailing whitespace"{{{
-autocmd BufWritePre * :%s/\s\+$//e"}}}
 " File header Macro""{{{
 " = creates fileHeading (modified version)
 function FileHeading()
@@ -101,23 +104,32 @@ function CFuncHeading()
   let s:line=getline(".")
   let s:type=split(split(s:line, "(")[0])[0]
   let s:name=split(split(s:line, "(")[0])[1]
-  let s:args=split(split(split(s:line, "(")[1], ")")[0], ",")
+  normal! f(l
+  normal! vi("ay
+  let s:args=split(join(split(@a, "\n"), ""), ",")
   normal! O<ESC>k
   let s:newline=line(".")
   let s:i = 0
   call setline(s:newline, "/*")
   call append (s:newline+s:i, " * Function name: " . s:name . "()")
   let s:i += 1
-  call append (s:newline+s:i, " * Function prototype: " . split(s:line, "{")[0])
-  unlet s:line
+  call append (s:newline+s:i, " * Function prototype: " . s:type . s:name . "(")
   let s:i += 1
+  for arg in s:args
+    let s:temp = substitute(arg, '^\s*\(.\{-}\)\s*$', '\1', '')
+    call append(s:newline+s:i, " *    " . s:temp  . ",")
+    let s:i += 1
+  endfor
+  call append(s:newline+s:i, " * )")
+  let s:i += 1
+  unlet s:line
   call append (s:newline+s:i, " * Description:  TODO")
   let s:i += 1
   call append (s:newline+s:i, " * Arguments:")
   let s:i += 1
   for arg in s:args
     let s:temp = substitute(arg, '^\s*\(.\{-}\)\s*$', '\1', '')
-    call append(s:newline+s:i, " *\t\t" . s:temp  . " - ")
+    call append(s:newline+s:i, " *    " . s:temp  . " - ")
     let s:i += 1
   endfor
   unlet s:args
@@ -134,8 +146,9 @@ function CFuncHeading()
   unlet s:newline
 endfunction
 
-imap <F3> <ESC>:execute CFuncHeading()<CR>?TODO<CR>nncw
+imap <F3> <ESC>:execute CFuncHeading()<CR>?TODO<CR>Ncw
 "}}}
 
 
 let maplocalleader='\\'
+let mapleader=','
