@@ -1,5 +1,9 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =3
+let g:netrw_dirhist_cnt =7
 let g:netrw_dirhist_1='/Users/christoph/CarboardSDhacksOG/.git'
 let g:netrw_dirhist_2='/Users/christoph/.vim'
 let g:netrw_dirhist_3='/Users/christoph/repo_st_632_3665_10607_pa1_bst_in_c_'
+let g:netrw_dirhist_4='/Users/christoph/cse100pa4/repo_st_632_4383_10607_pa4_6_degrees'
+let g:netrw_dirhist_5='/Users/christoph/temp'
+let g:netrw_dirhist_6='/Users/christoph'
+let g:netrw_dirhist_7='/Users/christoph/temp'
