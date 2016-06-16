@@ -51,7 +51,7 @@ function CFuncHeading()
   let s:i += 1
   call append (s:newline+s:i, " * Error Conditions: TODO")
   let s:i += 1
-  call append(s:newline+s:i, " * @return " . s:type . ": ")
+  call append(s:newline+s:i, " * return " . s:type . ": ")
   let s:i += 1
   unlet s:type
   call append(s:newline+s:i, " */")
