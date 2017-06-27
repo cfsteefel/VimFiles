@@ -23,13 +23,30 @@ Plugin 'tpope/vim-fugitive'
 " plugin from http://vim-scripts.org/vim/scripts.html
 Plugin 'L9'
 " Git plugin not hosted on GitHub
-Plugin 'git://git.wincent.com/command-t.git'
+Plugin 'https://github.com/wincent/command-t.git'
 
+" YCM plugin
 Plugin 'https://github.com/Valloric/YouCompleteMe.git'
+" YCM configuration generator
+Plugin 'rdnetto/YCM-Generator'
 
+"Plugin for compiling Tex documents
 Plugin 'lervag/vimtex'
 
+"Provides syntax highlighting for various languages
 Plugin 'https://github.com/sheerun/vim-polyglot.git'
+
+Plugin 'OCamlPro/ocp-indent'
+
+" Provides a bottom bar with info
+Plugin 'vim-airline/vim-airline'
+
+"Color scheme
+Plugin 'tomasr/molokai'
+
+Plugin 'KeitaNakamura/neodark.vim'
+
+Plugin 'lu-ren/SerialExperimentsLain'
 
 
 
@@ -54,19 +71,24 @@ filetype plugin indent on    " required
 " molokai works.
 set term=xterm
 let g:rehash256 = 1
+let g:neodark#use_256color = 1
 set t_Co=256
-colo molokai"}}}
+colo neodark
+"}}}
 "Indents and tab edits"{{{
-" Set up autindenting and syntax coloring
-filetype plugin indent on
+" Set up autoindenting and syntax coloring
 syntax on
 " Convert tabs to two spaces
 set smartindent
 set shiftwidth=2
 set softtabstop=2
-set expandtab"}}}
+set expandtab
+set listchars=tab:>-,trail:~
+set list
+"}}}
 " Show line numbers"{{{
-set number"}}}
+set number
+"}}}
 " search settings"{{{
 set showmatch
 set incsearch
@@ -74,19 +96,77 @@ set hlsearch"}}}
 " Enable the mouse"{{{
 set mouse=a
 "}}}
-" make Wq equivalent to wq for convenience"{{{
-cnoreabbrev Wq wq
-"}}}
 " 80 Character edits"{{{
 " Highlight characters past 80 characters in red
 highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 match OverLength /\%81v.\+/
 " Create a color column in the 80th column, useful for python
-set cc=80"}}}
-" Show tabs as >--, and show trailing whitespace as ~"{{{
-set listchars=tab:>-,trail:~
-set list"}}}
-
-
+set cc=80
+highlight ColorColumn ctermbg=Red
+"}}}
+"Plugin options"{{{
+let g:CommandTFileScanner="find"
+let g:CommandTSuppressMaxFilesWarning=1
+set wildignore+=*.o,*.class,.git,AndroidStudioProjects/MyApp/**,*.dSYM/**
+let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_extra_conf_globlist=['*', '']
+nnoremap <leader>f :YcmCompleter FixIt<CR>
+"}}}
+"Key remappings"{{{
 let maplocalleader='\\'
 let mapleader=','
+nnoremap j gj
+nnoremap k gk
+cnoreabbrev qq qall
+cnoreabbrev Wq wq
+"}}}
+" Random settings"{{{
+set ff=unix
+set showcmd
+set laststatus=2
+set wildmenu
+autocmd  BufWritePre *.{java,c,cpp,python,ml,hpp,h} :retab
+autocmd BufWritePre *.{java,c,cpp,python,ml,hpp,h} %s/\s\+$//e
+set encoding=utf-8
+set backspace=2
+set tabpagemax=100
+
+au BufNewFile,BufRead *.RESULT set filetype=RESULT
+if has("mouse")
+  set mouse=a
+endif
+"}}}
+"Ocaml Settings "{{{
+" ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
+let s:opam_share_dir = system("opam config var share")
+let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
+
+let s:opam_configuration = {}
+
+function! OpamConfOcpIndent()
+  execute "set rtp^=" . s:opam_share_dir . "/ocp-indent/vim"
+endfunction
+let s:opam_configuration['ocp-indent'] = function('OpamConfOcpIndent')
+
+function! OpamConfOcpIndex()
+  execute "set rtp+=" . s:opam_share_dir . "/ocp-index/vim"
+endfunction
+let s:opam_configuration['ocp-index'] = function('OpamConfOcpIndex')
+
+function! OpamConfMerlin()
+  let l:dir = s:opam_share_dir . "/merlin/vim"
+  execute "set rtp+=" . l:dir
+endfunction
+let s:opam_configuration['merlin'] = function('OpamConfMerlin')
+
+let s:opam_packages = ["ocp-indent", "ocp-index", "merlin"]
+let s:opam_check_cmdline = ["opam list --installed --short --safe --color=never"] + s:opam_packages
+let s:opam_available_tools = split(system(join(s:opam_check_cmdline)))
+for tool in s:opam_packages
+  " Respect package order (merlin should be after ocp-index)
+  if count(s:opam_available_tools, tool) > 0
+    call s:opam_configuration[tool]()
+  endif
+endfor
+" ## end of OPAM user-setup addition for vim / base ## keep this line
+"}}}
