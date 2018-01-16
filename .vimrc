@@ -36,8 +36,7 @@ Plugin 'lervag/vimtex'
 "Provides syntax highlighting for various languages
 Plugin 'https://github.com/sheerun/vim-polyglot.git'
 
-Plugin 'OCamlPro/ocp-indent'
-
+Plugin 'https://github.com/let-def/ocp-indent-vim.git'
 " Provides a bottom bar with info
 Plugin 'vim-airline/vim-airline'
 
@@ -48,7 +47,7 @@ Plugin 'KeitaNakamura/neodark.vim'
 
 Plugin 'lu-ren/SerialExperimentsLain'
 
-
+Plugin 'mhartington/oceanic-next'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -71,9 +70,12 @@ filetype plugin indent on    " required
 " molokai works.
 set term=xterm
 let g:rehash256 = 1
-let g:neodark#use_256color = 1
 set t_Co=256
-colo neodark
+" for vim 8
+if (has("termguicolors"))
+  set termguicolors
+endif
+colo OceanicNext
 "}}}
 "Indents and tab edits"{{{
 " Set up autoindenting and syntax coloring
@@ -95,6 +97,11 @@ set incsearch
 set hlsearch"}}}
 " Enable the mouse"{{{
 set mouse=a
+if has("mouse_sgr")
+    set ttymouse=sgr
+else
+    set ttymouse=xterm2
+  end
 "}}}
 " 80 Character edits"{{{
 " Highlight characters past 80 characters in red
@@ -132,11 +139,10 @@ set backspace=2
 set tabpagemax=100
 
 au BufNewFile,BufRead *.RESULT set filetype=RESULT
-if has("mouse")
-  set mouse=a
-endif
+au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+      \| exe "normal! g'\"" | endif
 "}}}
-"Ocaml Settings "{{{
+"{{{ opam settings
 " ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
 let s:opam_share_dir = system("opam config var share")
 let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
@@ -168,5 +174,6 @@ for tool in s:opam_packages
     call s:opam_configuration[tool]()
   endif
 endfor
+set rtp^="/Users/christoph/.opam/system/share/ocp-indent/vim"
 " ## end of OPAM user-setup addition for vim / base ## keep this line
 "}}}
