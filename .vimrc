@@ -1,8 +1,3 @@
-" Name: .vimrc
-" Author: Christoph Steefel
-" Created with help from Aniket Mathur, the interwebs.
-set foldmethod=marker
-set foldenable
 " Vundle information"{{{
 set nocompatible
 filetype off
@@ -16,44 +11,44 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
-" The following are examples of different formats supported.
-" Keep Plugin commands between vundle#begin/end.
-" plugin on GitHub repo
-Plugin 'tpope/vim-fugitive'
-" plugin from http://vim-scripts.org/vim/scripts.html
-Plugin 'L9'
-" Git plugin not hosted on GitHub
-Plugin 'https://github.com/wincent/command-t.git'
-
-" YCM plugin
-Plugin 'https://github.com/Valloric/YouCompleteMe.git'
-" YCM configuration generator
-Plugin 'rdnetto/YCM-Generator'
-
-"Plugin for compiling Tex documents
-Plugin 'lervag/vimtex'
-
-"Provides syntax highlighting for various languages
-Plugin 'https://github.com/sheerun/vim-polyglot.git'
-
-Plugin 'https://github.com/let-def/ocp-indent-vim.git'
 " Provides a bottom bar with info
 Plugin 'vim-airline/vim-airline'
 
 "Color scheme
+Plugin 'mhartington/oceanic-next'
+
 Plugin 'tomasr/molokai'
 
 Plugin 'KeitaNakamura/neodark.vim'
 
-Plugin 'lu-ren/SerialExperimentsLain'
+" Code formatting tools
+Plugin 'google/vim-maktaba'
+Plugin 'google/vim-codefmt'
+Plugin 'google/vim-glaive'
 
-Plugin 'mhartington/oceanic-next'
+Plugin 'tpope/vim-commentary.git'
+Plugin 'tpope/vim-fugitive.git'
+Plugin 'airblade/vim-gitgutter.git'
+
+Plugin 'w0rp/ale'
+
+" Has to be after ocp-indent, to not mess up indentation
+" Plugin 'https://github.com/sheerun/vim-polyglot'
+
+Plugin 'vim-scripts/LargeFile'
+
+if has('nvim')
+   Plugin 'nvim-treesitter/nvim-treesitter'
+   Plugin 'Shougo/deoplete.nvim'
+   Plugin 'nvim-lua/plenary.nvim'
+   Plugin 'nvim-telescope/telescope.nvim'
+endif
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
 " To ignore plugin indent changes, instead use:
-"filetype plugin on
+" filetype plugin on
 "
 " Brief help
 " :PluginList       - lists configured plugins
@@ -68,22 +63,23 @@ filetype plugin indent on    " required
 " Colorscheme"{{{
 " Set the terminal to X_term, and change the color to be 256 colors, so that
 " molokai works.
-set term=xterm
-let g:rehash256 = 1
-set t_Co=256
 " for vim 8
-if (has("termguicolors"))
-  set termguicolors
-endif
-colo OceanicNext
+set termguicolors
+let g:solarized_termtrans=1
+set t_Co=256
+set t_ut=
+colo neodark
+let g:rehash256 = 1
+let g:neodark#use_256color = 1
+
 "}}}
 "Indents and tab edits"{{{
 " Set up autoindenting and syntax coloring
 syntax on
 " Convert tabs to two spaces
 set smartindent
-set shiftwidth=2
-set softtabstop=2
+set shiftwidth=3
+set softtabstop=3
 set expandtab
 set listchars=tab:>-,trail:~
 set list
@@ -94,30 +90,26 @@ set number
 " search settings"{{{
 set showmatch
 set incsearch
-set hlsearch"}}}
+set hlsearch
+set ignorecase
+set smartcase
+"}}}
 " Enable the mouse"{{{
 set mouse=a
 if has("mouse_sgr")
-    set ttymouse=sgr
+ set ttymouse=sgr
 else
-    set ttymouse=xterm2
-  end
+   if !has('nvim')
+      set ttymouse=xterm2
+   endif
+endif
 "}}}
-" 80 Character edits"{{{
-" Highlight characters past 80 characters in red
+" 85 Character edits"{{{
+" Highlight characters past 85 characters in red
 highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-match OverLength /\%81v.\+/
-" Create a color column in the 80th column, useful for python
-set cc=80
-highlight ColorColumn ctermbg=Red
-"}}}
-"Plugin options"{{{
-let g:CommandTFileScanner="find"
-let g:CommandTSuppressMaxFilesWarning=1
-set wildignore+=*.o,*.class,.git,AndroidStudioProjects/MyApp/**,*.dSYM/**
-let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_extra_conf_globlist=['*', '']
-nnoremap <leader>f :YcmCompleter FixIt<CR>
+match OverLength /\%86v.\+/
+" Create a color column in the 85th column
+set cc=85
 "}}}
 "Key remappings"{{{
 let maplocalleader='\\'
@@ -126,54 +118,84 @@ nnoremap j gj
 nnoremap k gk
 cnoreabbrev qq qall
 cnoreabbrev Wq wq
+cnoreabbrev W w
+nmap <esc>OA <Up>
+nmap <esc>OB <Down>
+nmap <esc>OC <Right>
+nmap <esc>OD <Left>
+"}}}
+" Code formatting"{{{
+call glaive#Install()
+nnoremap <leader>fc <cmd>FormatCode<cr>
+vnoremap <leader>fl <cmd>FormatLines<cr>
+nnoremap <leader>d <cmd>ALEDetail<cr>
+" Glaive codefmt autopep8_executable="autopep8"
 "}}}
 " Random settings"{{{
 set ff=unix
 set showcmd
 set laststatus=2
+set cursorline
 set wildmenu
-autocmd  BufWritePre *.{java,c,cpp,python,ml,hpp,h} :retab
-autocmd BufWritePre *.{java,c,cpp,python,ml,hpp,h} %s/\s\+$//e
 set encoding=utf-8
 set backspace=2
 set tabpagemax=100
+set scrolloff=5
+set wildignore+=*.o
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 0
+let g:ale_completion_delay = 500
+if has('nvim')
+   let g:deoplete#enable_at_startup = 1
+   call deoplete#custom#option('sources', {
+   \ '_': ['ale'],
+   \ 'auto_complete_delay': 500,
+   \ 'max_list': 20,
+   \ 'num_processes': 0,
+   \ 'on_insert_enter': v:false,
+   \ 'yarp': v:true,
+   \})
+endif
+let g:silentGoFormatting = 1
 
-au BufNewFile,BufRead *.RESULT set filetype=RESULT
-au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-      \| exe "normal! g'\"" | endif
 "}}}
-"{{{ opam settings
-" ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
-let s:opam_share_dir = system("opam config var share")
-let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
+" Misc commands {{{
+command Json :%!python -m json.tool
 
-let s:opam_configuration = {}
-
-function! OpamConfOcpIndent()
-  execute "set rtp^=" . s:opam_share_dir . "/ocp-indent/vim"
-endfunction
-let s:opam_configuration['ocp-indent'] = function('OpamConfOcpIndent')
-
-function! OpamConfOcpIndex()
-  execute "set rtp+=" . s:opam_share_dir . "/ocp-index/vim"
-endfunction
-let s:opam_configuration['ocp-index'] = function('OpamConfOcpIndex')
-
-function! OpamConfMerlin()
-  let l:dir = s:opam_share_dir . "/merlin/vim"
-  execute "set rtp+=" . l:dir
-endfunction
-let s:opam_configuration['merlin'] = function('OpamConfMerlin')
-
-let s:opam_packages = ["ocp-indent", "ocp-index", "merlin"]
-let s:opam_check_cmdline = ["opam list --installed --short --safe --color=never"] + s:opam_packages
-let s:opam_available_tools = split(system(join(s:opam_check_cmdline)))
-for tool in s:opam_packages
-  " Respect package order (merlin should be after ocp-index)
-  if count(s:opam_available_tools, tool) > 0
-    call s:opam_configuration[tool]()
-  endif
-endfor
-set rtp^="/Users/christoph/.opam/system/share/ocp-indent/vim"
-" ## end of OPAM user-setup addition for vim / base ## keep this line
 "}}}
+"nvim-treesitter config{{{
+if has('nvim')
+   lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ignore_install = { 'godotResource', 'gdscript', 'teal' }, -- List of parsers to ignore installing
+  highlight = {
+    enable = true,              -- false will disable the whole extension
+    disable = {},  -- list of language that will be disabled 
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
+EOF
+" Disable folding, as it doesn't actually work that nicely with tree-sitter
+" (has knock-on effects)
+" set foldenable
+" set foldmethod=expr
+" set foldexpr=nvim_treesitter#foldexpr()
+" set foldlevel=2
+set formatexpr=glaive#FormatLines()
+endif
+
+let g:LargeFile=10
+
+"}}}
+" Telescope mappings{{{
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+endif
+" vim: foldmethod=marker

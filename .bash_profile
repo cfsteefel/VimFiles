@@ -1,15 +1,29 @@
-# lhopt -s expand_aliases
-export PATH=$PATH:~/.vim/colors
+# .bash_profile
+
+# User specific environment and startup programs
+
+export GIT_PS1_SHOWDIRTYSTATE=1
+export EDITOR="nvim"
+export GIT_EDITOR=$EDITOR
+export RIPGREP_CONFIG_PATH=~/.rg_config
+
+source /usr/share/git-core/contrib/completion/git-prompt.sh
+
 PROMPT_COMMAND=__prompt_command
 __prompt_command () {
-  export PS1="\[\e[91m\]GintsMBP:\[\e[91m\]\[\e[91m\]\W\[\e[m\] \[\e[95m\][$?\[\e[m\]\[\e[95m\]]\[\e[m\]\[\e[95m\]\[\e[m\] \[\e[95m\]\\$\[\e[m\] "
+   gp=$(__git_ps1 '%s')
+   export PS1="\[\e[91m\]\u@\h:\[\e[91m\]\[\e[91m\]\W\[\e[m\] \[\e[95m\][$?\[\e[m\]\[\e[95m\]]\[\e[m\]\[\e[95m\]\[\e[m\] \[\e[95m\]\\$\[\e[m\]\n\[\e[94m\]${gp}>\[\e[m\] "
 }
-alias csteefel='ssh csteefel@ieng6.ucsd.edu'
-alias caff='caffeinate -d &'
-alias decaff='pkill caffeinate'
-alias vim='vim -p'
-alias python='python2'
-alias ocaml="rlwrap ocaml"
 
-# OPAM configuration
-. /Users/christoph/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
+function addToPATH {
+  case ":$PATH:" in
+    *":$1:"*) :;; # already there
+    *) PATH="$1:$PATH";; # or PATH="$PATH:$1"
+  esac
+}
+
+alias vim="nvim -p"
+alias vimdiff="nvim -d"
+cpu16() { grep ^processor /proc/cpuinfo | sort -R | head -n 24 | awk '{print $3}'; }
+kindly() { taskset $(printf '0x%x\n' $(($(cpu16 | paste -sd '|')))) "$@"; }
+
